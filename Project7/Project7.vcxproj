@@ -118,6 +118,7 @@
     <ClInclude Include="array_sequence.h" />
     <ClInclude Include="list_sequence.h" />
     <ClInclude Include="sequence.h" />
+    <ClInclude Include="test.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

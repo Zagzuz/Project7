@@ -17,6 +17,7 @@ public:
 	void push_front(const T& element);
 	void remove(const T& element);
 	sequence<T>* get_sub(size_t start, size_t end);
+	~array_sequence() { delete[] elements_; }
 };
 
 template<class T>
@@ -72,7 +73,7 @@ void array_sequence<T>::insert(const T& element, size_t index)
 		return;
 	}
 
-	for (size_t i = this->size_; i > index; ++i)
+	for (size_t i = this->size_; i > index; --i)
 		elements_[i] = elements_[i - 1];
 	elements_[index] = element;
 	++this->size_;
@@ -127,7 +128,7 @@ void array_sequence<T>::push_front(const T& element)
 		return;
 	}
 
-	for (size_t i = this->size_++; i > 0; ++i)
+	for (size_t i = this->size_++; i > 0; --i)
 		elements_[i] = elements_[i - 1];
 	elements_[0] = element;
 }
@@ -158,16 +159,16 @@ void array_sequence<T>::remove(const T& element)
 template <class T>
 sequence<T>* array_sequence<T>::get_sub(size_t start, size_t end)
 {
-	if (start >= this->size_)	throw std::exception("start index out of bound");
+	if (start >= this->size_) throw std::exception("start index out of bound");
 	if (end >= this->size_) throw std::exception("end index out of bound");
 	if (end < start) throw std::exception("end index is less than start");
 
-	T* temp = new T[end - start];
+	T* temp = new T[end - start + 1];
 	for (size_t i = start; i <= end; ++i)
 		temp[i - start] = elements_[i];
 	
 	array_sequence<T>* n = new array_sequence<T>;
 	n->elements_ = temp;
-	n->capacity_ = n->size_ = end - start;
+	n->capacity_ = n->size_ = end - start + 1;
 	return n;
 }

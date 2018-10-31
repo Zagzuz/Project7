@@ -10,8 +10,8 @@ class list_sequence : public sequence<T>
 		T element;
 		node *prev, *next;
 		node() : prev(nullptr), next(nullptr) {}
-		node(const T& e) : prev(nullptr), next(nullptr), element(e) {}
-		node(node* p, node* n, const T& e) : prev(p), next(n), element(e) {}
+		node(const T& e) : element(e), prev(nullptr), next(nullptr) {}
+		node(node* p, node* n, const T& e) : element(e), prev(p), next(n) {}
 	};
 	node *head_, *tail_;
 public:
@@ -24,12 +24,13 @@ public:
 	void push_front(const T& element);
 	void remove(const T& element);
 	sequence<T>* get_sub(size_t start, size_t end);
+	~list_sequence();
 };
 
 template<class T>
 T list_sequence<T>::get(size_t index)
 {
-	if (index >= size_)
+	if (index >= this->size_)
 		throw std::exception("index out of bounds");
 
 	node* temp = head_;
@@ -42,7 +43,7 @@ T list_sequence<T>::get(size_t index)
 template<class T>
 T list_sequence<T>::get_first()
 {
-	if (size_ == 0)
+	if (this->size_ == 0)
 		throw std::exception("sequence is empty");
 	return head_->element;
 }
@@ -50,7 +51,7 @@ T list_sequence<T>::get_first()
 template<class T>
 T list_sequence<T>::get_last()
 {
-	if (size_ == 0)
+	if (this->size_ == 0)
 		throw std::exception("sequence is empty");
 	return tail_->element;
 }
@@ -58,18 +59,25 @@ T list_sequence<T>::get_last()
 template <class T>
 void list_sequence<T>::insert(const T& element, size_t index)
 {
-	if (index == size_)
+	if (head_ == nullptr)
 	{
-		tail->next = new node(tail, nullptr, element);
-		tail = tail->next;
-		size_ += 1;
+		head_ = tail_ = new node(element);
+		this->size_ = 1;
 		return;
 	}
 
-	if (index > size_) 
+	if (index == this->size_)
+	{
+		tail_->next = new node(tail_, nullptr, element);
+		tail_ = tail_->next;
+		this->size_ += 1;
+		return;
+	}
+
+	if (index > this->size_) 
 		throw std::exception("index out of bounds");
 	
-	node* temp = head;
+	node* temp = head_;
 	for (size_t i = 0; i < index; ++i)
 		temp = temp->next;
 	
@@ -77,8 +85,8 @@ void list_sequence<T>::insert(const T& element, size_t index)
 	if (temp->prev) temp->prev->next = n;
 	temp->prev = n;
 
-	if (index == 0) head = n;
-	size_ += 1;
+	if (index == 0) head_ = n;
+	this->size_ += 1;
 }
 
 template <class T>
@@ -90,7 +98,7 @@ void list_sequence<T>::push_back(const T& element)
 		tail_->next = new node(tail_, nullptr, element);
 		tail_ = tail_->next;
 	}
-	size_ += 1;
+	this->size_ += 1;
 }
 
 template <class T>
@@ -102,7 +110,7 @@ void list_sequence<T>::push_front(const T& element)
 		head_->prev = new node(nullptr, head_, element);
 		head_ = head_->prev;
 	}
-	size_ += 1;
+	this->size_ += 1;
 }
 
 template<class T>
@@ -118,7 +126,8 @@ void list_sequence<T>::remove(const T& element)
 			if (head_ == temp) head_ = temp_saver;
 			if (tail_ == temp) tail_ = temp->prev;
 			delete temp;
-			temp = temp->saver;
+			temp = temp_saver;
+			--this->size_;
 		}
 		else temp = temp->next;
 	}
@@ -127,17 +136,26 @@ void list_sequence<T>::remove(const T& element)
 template <class T>
 sequence<T>* list_sequence<T>::get_sub(size_t start, size_t end)
 { 
-	if (start >= this->size_)	throw std::exception("start index out of bound");
+	if (start >= this->size_) throw std::exception("start index out of bound");
 	if (end >= this->size_) throw std::exception("end index out of bound");
 	if (end < start) throw std::exception("end index is less than start");
 
-	list_sequence<T>* n = list_sequence<T>;
+	list_sequence<T>* n = new list_sequence<T>;
 	node* temp = head_;
-	for (size_t i = 0; i < size_; ++i)
+	for (size_t i = 0; i < this->size_; ++i)
 	{
 		if (i >= start && i <= end) n->push_back(temp->element);
 		temp = temp->next;
 	}
 
 	return n;
+}
+
+template <class T>
+list_sequence<T>::~list_sequence()
+{
+	for (node* temp = head_->next; temp; temp = temp->next)
+		delete temp->prev;
+	delete tail_;
+	tail_ = head_ = nullptr;
 }

@@ -10,8 +10,8 @@ protected:
 	size_t size_;
 public:
 	sequence() : size_(0) {}
-	bool empty() { return size_ == 0; }
-	size_t size() { return size_; }
+	bool empty() const { return size_ == 0; }
+	size_t size() const { return size_; }
 	virtual T get(size_t index) = 0;
 	virtual T get_first() = 0;
 	virtual T get_last() = 0;
@@ -20,4 +20,5 @@ public:
 	virtual void push_front(const T& element) = 0;
 	virtual void remove(const T& element) = 0;
 	virtual sequence<T>* get_sub(size_t start, size_t end) = 0;
+	virtual ~sequence() {}
 };
